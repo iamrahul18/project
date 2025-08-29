@@ -8,6 +8,7 @@ import { useOrders } from './hooks/useOrders';
 
 function App() {
   const [activeTab, setActiveTab] = useState('products');
+  const [refreshKey, setRefreshKey] = useState(0); // Add this for forcing Analytics refresh
   const { products } = useProducts();
   const { orders } = useOrders();
 
@@ -42,16 +43,21 @@ function App() {
     }
   }, []);
 
+  // Add this function to handle data changes
+  const handleDataChange = () => {
+    setRefreshKey(prev => prev + 1);
+  };
+
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'products':
-        return <ProductManagement />;
+        return <ProductManagement onDataChange={handleDataChange} />;
       case 'orders':
-        return <OrderManagement />;
+        return <OrderManagement onDataChange={handleDataChange} />;
       case 'analytics':
-        return <Analytics orders={orders} products={products} />;
+        return <Analytics key={refreshKey} orders={orders} products={products} />;
       default:
-        return <ProductManagement />;
+        return <ProductManagement onDataChange={handleDataChange} />;
     }
   };
 

@@ -5,7 +5,11 @@ import { OrderForm } from './OrderForm';
 import { useOrders } from '../hooks/useOrders';
 import { useProducts } from '../hooks/useProducts';
 
-export const OrderManagement: React.FC = () => {
+interface OrderManagementProps {
+  onDataChange?: () => void;
+}
+
+export const OrderManagement: React.FC<OrderManagementProps> = ({ onDataChange }) => {
   const { orders, loading: ordersLoading, addOrder, updateStatus, refreshOrders } = useOrders();
   const { products, refreshProducts } = useProducts();
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -15,6 +19,8 @@ export const OrderManagement: React.FC = () => {
     if (result.success) {
       refreshOrders();
       refreshProducts(); // Refresh products to update stock quantities
+      onDataChange?.(); // Notify parent that data has changed
+      setIsFormOpen(false);
     }
     return result;
   };
@@ -22,6 +28,7 @@ export const OrderManagement: React.FC = () => {
   const handleUpdateOrderStatus = async (orderId: string, status: 'pending' | 'completed' | 'cancelled') => {
     await updateStatus(orderId, status);
     refreshOrders();
+    onDataChange?.(); // Notify parent that data has changed
   };
 
   const handleCloseForm = () => {

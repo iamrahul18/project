@@ -5,7 +5,11 @@ import { ProductForm } from './ProductForm';
 import { Product } from '../types';
 import { useProducts } from '../hooks/useProducts';
 
-export const ProductManagement: React.FC = () => {
+interface ProductManagementProps {
+  onDataChange?: () => void;
+}
+
+export const ProductManagement: React.FC<ProductManagementProps> = ({ onDataChange }) => {
   const { products, loading, addProduct, editProduct, removeProduct, refreshProducts } = useProducts();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -18,6 +22,7 @@ export const ProductManagement: React.FC = () => {
       await addProduct(productData);
     }
     refreshProducts();
+    onDataChange?.(); // Notify parent that data has changed
   };
 
   const handleEditProduct = (product: Product) => {
@@ -28,6 +33,7 @@ export const ProductManagement: React.FC = () => {
   const handleDeleteProduct = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       await removeProduct(id);
+      onDataChange?.(); // Notify parent that data has changed
     }
   };
 
